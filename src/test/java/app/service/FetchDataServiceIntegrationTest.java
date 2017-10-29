@@ -14,7 +14,7 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class FetchDataServiceTest {
+public class FetchDataServiceIntegrationTest {
 
 	@Autowired
 	private FetchDataService fetchDataService;
