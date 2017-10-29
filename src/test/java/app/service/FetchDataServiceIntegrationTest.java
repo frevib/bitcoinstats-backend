@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.concurrent.CompletableFuture;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -25,9 +27,15 @@ public class FetchDataServiceIntegrationTest {
 
 	@Test
 	public void getBitcoinData() throws Exception {
+		// prepare
 		String url = "https://min-api.cryptocompare.com/data/histominute?fsym=BTC&tsym=USD&limit=60&aggregate=3&e=CCCAGG";
-		ApiResponse response = fetchDataService.getBitcoinData(url);
 
+		// run
+		CompletableFuture<ApiResponse> responsePromise = fetchDataService.getBitcoinData(url);
+		CompletableFuture.allOf(responsePromise);
+		ApiResponse response = responsePromise.get();
+
+		// verify
 		assertNotNull(response);
 		assertEquals(response.getResponseStatus(), "Success");
 		assertEquals(response.getType(), 100);

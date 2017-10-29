@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS bitcoin_data;
+
+CREATE TABLE bitcoin_data (id INT PRIMARY KEY AUTO_INCREMENT, daily_price DOUBLE);
