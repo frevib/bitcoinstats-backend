@@ -7,6 +7,7 @@ import app.model.BitcoinPrices;
 import app.model.BitcoinPricesResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @Service
-public class DatabaseService {
+public class DatabaseService implements InitializingBean{
 
 	private static final Logger LOG = LoggerFactory.getLogger(DatabaseService.class);
 
@@ -35,6 +36,11 @@ public class DatabaseService {
 	public DatabaseService(FetchDataService fetchDataService, BitcoinDataMapper bitcoinDataMapper) {
 		this.fetchDataService = fetchDataService;
 		this.bitcoinDataMapper = bitcoinDataMapper;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		populateDatabase();
 	}
 
 	public BitcoinPricesResponse findAll(String order) {

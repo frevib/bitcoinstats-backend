@@ -22,11 +22,6 @@ public class BitcoinStatsController {
 	@Autowired
 	private DatabaseService databaseService;
 
-	@RequestMapping("/")
-	public String test() {
-		return "test me!";
-	}
-
 	@RequestMapping("/populate")
 	public boolean populateDatabase() throws ExecutionException, InterruptedException {
 		databaseService.populateDatabase();

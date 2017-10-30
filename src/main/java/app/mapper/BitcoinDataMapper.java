@@ -23,6 +23,6 @@ public interface BitcoinDataMapper {
 			@Result(property = "hourlyPrice", column = "hourly_price"),
 			@Result(property = "minutelyPrice", column = "minutely_price")
 	})
-	@Select("select * from bitcoin_data order by ${order}")
+	@Select("select * from bitcoin_data order by ${order} desc limit 25")
 	List<BitcoinPrices> findAll(@Param("order") String order);
 }

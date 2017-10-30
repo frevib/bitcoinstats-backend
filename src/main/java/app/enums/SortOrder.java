@@ -1,7 +1,7 @@
 package app.enums;
 
 public enum SortOrder {
-	daily,
-	hourly,
-	minutely
+	daily_price,
+	hourly_price,
+	minutely_price
 }
