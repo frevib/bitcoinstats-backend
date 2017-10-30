@@ -3,6 +3,8 @@ package app.service;
 import app.mapper.BitcoinDataMapper;
 import app.model.ApiResponse;
 import app.model.BitcoinData;
+import app.model.BitcoinPrices;
+import app.model.BitcoinPricesResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,9 +15,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @Service
-public class PopulateDatabaseService {
+public class DatabaseService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PopulateDatabaseService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DatabaseService.class);
 
 	@Value("${daily.prices.url}")
 	private String dailyPricesUrl;
@@ -30,9 +32,16 @@ public class PopulateDatabaseService {
 
 	private BitcoinDataMapper bitcoinDataMapper;
 
-	public PopulateDatabaseService(FetchDataService fetchDataService, BitcoinDataMapper bitcoinDataMapper) {
+	public DatabaseService(FetchDataService fetchDataService, BitcoinDataMapper bitcoinDataMapper) {
 		this.fetchDataService = fetchDataService;
 		this.bitcoinDataMapper = bitcoinDataMapper;
+	}
+
+	public BitcoinPricesResponse findAll(String order) {
+		List<BitcoinPrices> bitcoinPricesList = bitcoinDataMapper.findAll(order);
+
+		// Just a separating database and response models, need to filter out columns that are not needed in response.
+		return new BitcoinPricesResponse(bitcoinPricesList);
 	}
 
 	public boolean populateDatabase() throws ExecutionException, InterruptedException {
@@ -42,14 +51,14 @@ public class PopulateDatabaseService {
 		CompletableFuture<ApiResponse> minutelyPricesPromise = fetchDataService.getBitcoinData(dailyMinutelyPricesUrl);
 		CompletableFuture.allOf(dailyPricesPromise, hourlyPricesPromise, minutelyPricesPromise).join();
 
-		ApiResponse dailyPriceReponse = dailyPricesPromise.get();
-		ApiResponse hourlyPriceReponse = dailyPricesPromise.get();
-		ApiResponse minutelyPriceReponse = dailyPricesPromise.get();
+		ApiResponse dailyPriceResponse = dailyPricesPromise.get();
+		ApiResponse hourlyPriceResponse = hourlyPricesPromise.get();
+		ApiResponse minutelyPriceResponse = minutelyPricesPromise.get();
 
 		insertToDatabase(
-				dailyPriceReponse.getBitcoinDataList(),
-				hourlyPriceReponse.getBitcoinDataList(),
-				minutelyPriceReponse.getBitcoinDataList());
+				dailyPriceResponse.getBitcoinDataList(),
+				hourlyPriceResponse.getBitcoinDataList(),
+				minutelyPriceResponse.getBitcoinDataList());
 		return true;
 	}
 
