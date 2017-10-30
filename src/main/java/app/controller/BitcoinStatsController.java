@@ -24,6 +24,7 @@ public class BitcoinStatsController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping("/getbtprices")
 	public BitcoinPricesResponse getBitcoinPrices(@QueryParam("order") String order) {
+		LOG.info("Request to /getbtprices");
 		SortOrder sortOrder = SortOrder.valueOf(order);
 		BitcoinPricesResponse bitcoinPricesResponse = databaseService.findAll(sortOrder.toString());
 
