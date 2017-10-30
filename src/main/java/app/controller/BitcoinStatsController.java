@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.ws.rs.QueryParam;
-import java.util.concurrent.ExecutionException;
 
 @RestController
 public class BitcoinStatsController {
@@ -22,13 +21,7 @@ public class BitcoinStatsController {
 	@Autowired
 	private DatabaseService databaseService;
 
-	@RequestMapping("/populate")
-	public boolean populateDatabase() throws ExecutionException, InterruptedException {
-		databaseService.populateDatabase();
-		return true;
-	}
-
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "*")
 	@RequestMapping("/getbtprices")
 	public BitcoinPricesResponse getBitcoinPrices(@QueryParam("order") String order) {
 		SortOrder sortOrder = SortOrder.valueOf(order);
