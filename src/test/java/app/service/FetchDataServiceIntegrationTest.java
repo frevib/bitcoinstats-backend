@@ -40,5 +40,4 @@ public class FetchDataServiceIntegrationTest {
 		assertEquals(response.getResponseStatus(), "Success");
 		assertEquals(response.getType(), 100);
 	}
-
 }

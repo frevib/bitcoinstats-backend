@@ -36,19 +36,33 @@ public class PopulateDatabaseService {
 	}
 
 	public boolean populateDatabase() throws ExecutionException, InterruptedException {
+		LOG.info("Populating database.");
 		CompletableFuture<ApiResponse> dailyPricesPromise = fetchDataService.getBitcoinData(dailyPricesUrl);
-		CompletableFuture.allOf(dailyPricesPromise);
+		CompletableFuture<ApiResponse> hourlyPricesPromise = fetchDataService.getBitcoinData(hourlyPricesUrl);
+		CompletableFuture<ApiResponse> minutelyPricesPromise = fetchDataService.getBitcoinData(dailyMinutelyPricesUrl);
+		CompletableFuture.allOf(dailyPricesPromise, hourlyPricesPromise, minutelyPricesPromise).join();
 
 		ApiResponse dailyPriceReponse = dailyPricesPromise.get();
+		ApiResponse hourlyPriceReponse = dailyPricesPromise.get();
+		ApiResponse minutelyPriceReponse = dailyPricesPromise.get();
 
-
-		insertToDatabase(dailyPriceReponse.getBitcoinDataList());
+		insertToDatabase(
+				dailyPriceReponse.getBitcoinDataList(),
+				hourlyPriceReponse.getBitcoinDataList(),
+				minutelyPriceReponse.getBitcoinDataList());
 		return true;
 	}
 
-	private void insertToDatabase(List<BitcoinData> bitcoinData) {
-		for (BitcoinData data : bitcoinData) {
-			bitcoinDataMapper.insertCheckout(data.getOpen());
+	private void insertToDatabase(
+			List<BitcoinData> hourlyBitcoinData,
+			List<BitcoinData> dailyBitcoinData,
+			List<BitcoinData> minutelyBitcoinData) {
+
+		for (int i = 0; i < hourlyBitcoinData.size(); i++) {
+			bitcoinDataMapper.insertCheckout(
+					dailyBitcoinData.get(i).getOpen(),
+					hourlyBitcoinData.get(i).getOpen(),
+					minutelyBitcoinData.get(i).getOpen());
 		}
 	}
 }
